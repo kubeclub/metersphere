@@ -88,11 +88,13 @@ public class JarConfigUtils {
     }
 
     public static List<String> getFileNames(String path) {
+        List<String> fileNames = new ArrayList<>();
         File f = new File(path);
         if (!f.exists()) {
             f.mkdirs();
+            return fileNames;
         }
-        List<String> fileNames = new ArrayList<>();
+
         File fa[] = f.listFiles();
         for (int i = 0; i < fa.length; i++) {
             File fs = fa[i];
