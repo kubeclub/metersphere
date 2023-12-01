@@ -420,7 +420,7 @@ export default {
       this.demandValue = [];
       data.forEach((item) => {
         let option = {
-          label: item.platform + ": " + item.name,
+          label: item.platform + ': ' + item.name + ': ' + item.id,
           value: item.id,
         };
         if (this.form.demandId === item.id) {

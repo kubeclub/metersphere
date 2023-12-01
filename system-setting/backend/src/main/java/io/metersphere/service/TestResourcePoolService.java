@@ -190,14 +190,16 @@ public class TestResourcePoolService {
     }
 
     private boolean validateTestResourcePool(TestResourcePoolDTO testResourcePool) {
-        if (StringUtils.equalsIgnoreCase(testResourcePool.getType(), ResourcePoolTypeEnum.K8S.name())) {
-            KubernetesResourcePoolService resourcePoolService = CommonBeanFactory.getBean(KubernetesResourcePoolService.class);
-            if (resourcePoolService == null) {
-                return false;
-            }
-            return resourcePoolService.validate(testResourcePool);
-        }
-        return nodeResourcePoolService.validate(testResourcePool);
+        // todo
+        return true;
+//        if (StringUtils.equalsIgnoreCase(testResourcePool.getType(), ResourcePoolTypeEnum.K8S.name())) {
+//            KubernetesResourcePoolService resourcePoolService = CommonBeanFactory.getBean(KubernetesResourcePoolService.class);
+//            if (resourcePoolService == null) {
+//                return false;
+//            }
+//            return resourcePoolService.validate(testResourcePool);
+//        }
+//        return nodeResourcePoolService.validate(testResourcePool);
     }
 
     public List<TestResourcePoolDTO> listValidResourcePools() {

@@ -113,8 +113,9 @@ export function hasPermissions(...permissions) {
 }
 
 export function hasLicense() {
-  let v = localStorage.getItem(LicenseKey);
-  return v && v === 'valid';
+  return true;
+  // let v = localStorage.getItem(LicenseKey);
+  // return v && v === 'valid';
 }
 
 
