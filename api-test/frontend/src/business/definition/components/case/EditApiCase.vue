@@ -19,6 +19,7 @@
           :useEnvironment="environment"
           :is-case-edit="isCaseEdit"
           :button-text="saveButtonText"
+          :loaded="loaded"
           ref="header"
           v-if="refreshHeader" />
       </template>
@@ -37,6 +38,7 @@
                 @showExecResult="showExecResult"
                 @showHistory="showHistory"
                 @reLoadCase="reLoadCase"
+                @addCase="addCase"
                 :environment="environment"
                 :case-item-height="caseItemHeight"
                 @setSelectedCaseId="setSelectedCaseId"
@@ -244,7 +246,7 @@ export default {
     setSelectedCaseId(caseId) {
       this.selectCaseId = caseId;
     },
-    saveCase(hideAlert) {
+    saveCase(hideAlert, created) {
       if (this.loaded) {
         this.close();
       }
@@ -258,7 +260,7 @@ export default {
       }
       if (this.apiCaseList && this.apiCaseList.length !== 0) {
         let item = this.apiCaseList[index];
-        this.$refs.apiCaseItem[index].saveTestCase(item, hideAlert);
+        this.$refs.apiCaseItem[index].saveTestCase(item, hideAlert, created);
       }
     },
     saveApiAndCase(api) {
@@ -450,7 +452,13 @@ export default {
           if (this.$refs.apiCaseItem && this.$refs.apiCaseItem[0]) {
             this.$refs.apiCaseItem[0].reload();
           }
-          store.currentApiCase = { refresh: true, id: data.id, status: status, passRate: passRate, reportId: data.threadName };
+          store.currentApiCase = {
+            refresh: true,
+            id: data.id,
+            status: status,
+            passRate: passRate,
+            reportId: data.threadName,
+          };
         });
       }
     },
@@ -607,11 +615,15 @@ export default {
         };
         request.projectId = getCurrentProjectID();
         obj.request = request;
+        this.apiCaseList = [];
         this.apiCaseList.unshift(obj);
       }
     },
     copyCase(data) {
       data.type = 'AddCase';
+      if (!this.api.request) {
+        this.api.request = data.request;
+      }
       this.apiCaseList.unshift(data);
     },
 
@@ -645,7 +657,6 @@ export default {
       row.request.projectId = this.projectId;
       row.request.id = row.id;
       this.runData.push(row.request);
-      /*触发执行操作*/
       this.reportId = getUUID().substring(0, 8);
       this.testCaseId = row.id ? row.id : row.request.id;
       this.$emit('refreshCase', this.testCaseId);
