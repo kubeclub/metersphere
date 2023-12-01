@@ -50,8 +50,10 @@ public class JSONSchemaBuilder {
         } else if (object.has(PropertyConstant.TYPE)) {
             if (object.get(PropertyConstant.TYPE).getAsString().equals(PropertyConstant.ARRAY)) {
                 analyzeProperty(rootObj, PropertyConstant.MS_OBJECT, object, map);
-            } else if (!object.get(PropertyConstant.TYPE).getAsString().equals(PropertyConstant.OBJECT)) {
+            } else if (!object.get(PropertyConstant.TYPE).getAsString().equals(PropertyConstant.OBJECT) && !(object instanceof JsonObject)) {
                 analyzeProperty(rootObj, object.getAsString(), object, map);
+            } else if (object instanceof JsonObject){
+                formatObject(map, object, rootObj);
             }
         }
     }
@@ -116,7 +118,7 @@ public class JSONSchemaBuilder {
             propertyObjType = object.get(PropertyConstant.TYPE).getAsString();
         }
         if (propertyObjType.equals(PropertyConstant.STRING) || propertyObjType.equals(PropertyConstant.ENUM)) {
-            concept.put(propertyName, FormatterUtil.getMockValue(object));
+            concept.put(propertyName, object.has(PropertyConstant.MOCK) ? FormatterUtil.getMockValue(object) : StringUtils.EMPTY);
         } else if (propertyObjType.equals(PropertyConstant.INTEGER) || propertyObjType.equals(PropertyConstant.NUMBER)) {
             try {
                 concept.put(propertyName, 0);
@@ -256,7 +258,7 @@ public class JSONSchemaBuilder {
     }
 
     private static void formatObject(Map<String, String> map, JsonObject jsonObject, JSONObject concept) {
-        JsonObject propertiesObj = jsonObject.get(PropertyConstant.PROPERTIES).getAsJsonObject();
+        JsonObject propertiesObj = jsonObject.has(PropertyConstant.PROPERTIES) ? jsonObject.get(PropertyConstant.PROPERTIES).getAsJsonObject(): new JsonObject();
         for (Entry<String, JsonElement> entry : propertiesObj.entrySet()) {
             String propertyKey = entry.getKey();
             JsonObject propertyObj = propertiesObj.get(propertyKey).getAsJsonObject();
@@ -285,7 +287,7 @@ public class JSONSchemaBuilder {
             JSONArray jsonArray = (JSONArray) root.get(PropertyConstant.MS_OBJECT);
             List<String> list = new LinkedList<>();
             JSONSchemaParser.toJsonString(jsonArray, list);
-            return list.toString();
+            return JSON.toJSONString(list);
         }
         return JSON.toJSONString(JSON.toMap(root));
     }

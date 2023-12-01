@@ -31,7 +31,7 @@
                 <i class="el-icon-edit" style="cursor: pointer" @click="showInput(apiCase)" />
               </span>
             </span>
-            <div v-if="apiCase.id" style="color: #999999; font-size: 12px;margin-top: 8px;">
+            <div v-if="apiCase.id" style="color: #999999; font-size: 12px; margin-top: 8px">
               <span style="margin-left: 10px">
                 {{ apiCase.updateTime | datetimeFormat }}
                 {{ apiCase.updateUser }}
@@ -623,10 +623,10 @@ export default {
         data.method = data.protocol;
       }
     },
-    addModule(row) {
-      this.saveApi(row, 'default-module');
+    addModule(row, created) {
+      this.saveApi(row, 'default-module', created);
     },
-    saveApi(row, module) {
+    saveApi(row, module, created) {
       let data = this.api;
       data.name = this.apiCase.name;
       data.moduleId = module;
@@ -638,6 +638,9 @@ export default {
           this.api.saved = false;
           row.apiDefinitionId = data.id;
           this.saveCase(row);
+        }
+        if (created) {
+          this.$emit('addCase');
         }
       });
     },
@@ -676,7 +679,7 @@ export default {
         }
       }
     },
-    saveCase(row, hideAlert) {
+    saveCase(row, hideAlert, created) {
       this.isSave = true;
       let tmp = JSON.parse(JSON.stringify(row));
       this.isShowInput = false;
@@ -737,13 +740,16 @@ export default {
           if (!hideAlert) {
             this.$emit('refresh');
           }
+          if (created) {
+            this.$emit('addCase');
+          }
         },
         (error) => {
           this.isSave = false;
         }
       );
     },
-    saveTestCase(row, hideAlert) {
+    saveTestCase(row, hideAlert, created) {
       if (this.validate(row)) {
         return;
       }
@@ -758,11 +764,11 @@ export default {
         if (this.compare.indexOf(row.id) === -1) {
           this.compare.push(row.id);
           if (this.api.saved) {
-            this.addModule(row);
+            this.addModule(row, created);
           } else {
             this.api.source = 'editCase';
             if (!this.isSave) {
-              this.saveCase(row, hideAlert);
+              this.saveCase(row, hideAlert, created);
             }
           }
         }
